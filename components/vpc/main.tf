@@ -1,35 +1,49 @@
 locals {
-  subnets = flatten([
-    for subnet in var.subnet_settings : [
-      for i in range(length(subnet.azs)) : {
-        cidr_block = subnet.cidr_block[i]
-        azs        = subnet.azs[i]
-        name       = subnet.name
-      }
-    ]
-  ])
+  public_subnet = [for i in range(length(var.public_subnet.azs)) : {
+    azs        = var.public_subnet.azs[i]
+    cidr_block = var.public_subnet.cidr_block[i]
+    name       = var.public_subnet.name
+  }]
+  private_subnet = [for i in range(length(var.private_subnet.azs)) : {
+    azs        = var.private_subnet.azs[i]
+    cidr_block = var.private_subnet.cidr_block[i]
+    name       = var.private_subnet.name
+  }]
 }
 
 #################################################
 # VPC
 #################################################
-
 resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
 
   tags = {
-    Name = "cidr block"
+    Name = "wordpress-${var.env_name}-aws-vpc"
   }
 }
 
-resource "aws_subnet" "subnet" {
+resource "aws_subnet" "public_subnet" {
   vpc_id = aws_vpc.vpc.id
 
-  count             = length(local.subnets)
-  availability_zone = local.subnets[count.index].azs
-  cidr_block        = local.subnets[count.index].cidr_block
+  count             = length(local.public_subnet)
+  availability_zone = local.public_subnet[count.index].azs
+  cidr_block        = local.public_subnet[count.index].cidr_block
 
   tags = {
-    "Name" = "wordpress-${var.env_name}-${local.subnets[count.index].name}-subnet-${count.index + 1}"
+    "Name"        = "wordpress-${var.env_name}-${local.public_subnet[count.index].name}-subnet-${local.public_subnet[count.index].azs}"
+    "Subnet-type" = "${local.public_subnet[count.index].name}"
+  }
+}
+
+resource "aws_subnet" "private_subnet" {
+  vpc_id = aws_vpc.vpc.id
+
+  count             = length(local.private_subnet)
+  availability_zone = local.private_subnet[count.index].azs
+  cidr_block        = local.private_subnet[count.index].cidr_block
+
+  tags = {
+    "Name"        = "wordpress-${var.env_name}-${local.private_subnet[count.index].name}-subnet-${local.private_subnet[count.index].azs}"
+    "Subnet-type" = "${local.private_subnet[count.index].name}"
   }
 }
