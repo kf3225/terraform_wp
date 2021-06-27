@@ -16,12 +16,30 @@ variable "cidr_block" {
   description = "cidr block of vpc"
 }
 
-variable "subnet_settings" {
-  type = list(object({
+variable "public_subnet" {
+  type = object({
     azs        = list(string)
     cidr_block = list(string)
     name       = string
-  }))
-  default     = []
-  description = "subnet settings list"
+  })
+  default = {
+    azs        = []
+    cidr_block = []
+    name       = "public_subnet"
+  }
+  description = "public subnet settings"
+}
+
+variable "private_subnet" {
+  type = object({
+    azs        = list(string)
+    cidr_block = list(string)
+    name       = string
+  })
+  default = {
+    azs        = []
+    cidr_block = []
+    name       = "private_subnet"
+  }
+  description = "private subnet settings"
 }
