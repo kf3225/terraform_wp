@@ -27,3 +27,9 @@ variable "private_subnet" {
   default     = {}
   description = "private subnet list"
 }
+
+variable "security_group_id" {
+  type        = string
+  default     = ""
+  description = "security group id"
+}
