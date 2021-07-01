@@ -39,3 +39,11 @@ security_group_rules = {
     cidr_block = ["0.0.0.0/0"]
   }
 }
+
+#################################################
+# RDS
+#################################################
+engine_name = "mysql"
+major_engine_version = "5.7"
+charset = "utf8mb4"
+option_name = "MARIADB_AUDIT_PLUGIN"
